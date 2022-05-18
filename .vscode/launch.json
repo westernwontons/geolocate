@@ -1,0 +1,36 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug executable 'geolocate'",
+			"cargo": {
+				"args": ["build", "--bin=geolocate", "--package=geolocate"],
+				"filter": {
+					"name": "geolocate",
+					"kind": "bin"
+				}
+			},
+			"args": ["-ip '188.24.96.45'"],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug unit tests in executable 'geolocate'",
+			"cargo": {
+				"args": ["test", "--no-run", "--bin=geolocate", "--package=geolocate"],
+				"filter": {
+					"name": "geolocate",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		}
+	]
+}
