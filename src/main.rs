@@ -22,13 +22,20 @@ async fn get_location(api_key: String, ip: String) -> Result<(), Box<dyn std::er
         api_key, ip
     );
 
-    let response: String = reqwest::get(url).await?.text().await?;
+    let response = reqwest::get(url).await;
 
-    let serialized: serde_json::Map<String, Value> = serde_json::from_str(&response).unwrap();
-
-    println!("{}", serde_json::to_string_pretty(&serialized).unwrap());
-
-    Ok(())
+    match response {
+        Ok(resp) => {
+            let serialized: serde_json::Map<String, Value> =
+                serde_json::from_str(&resp.text().await?).unwrap();
+            println!("{}", serde_json::to_string_pretty(&serialized).unwrap());
+            return Ok(());
+        }
+        Err(e) => {
+            println!("{}", e);
+            return Ok(());
+        }
+    };
 }
 
 #[tokio::main]
@@ -51,28 +58,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         },
     }
-
-    // match std::env::var("GEO_TOKEN") {
-    //     Ok(key) => {
-    //         args.api_key = Some(key);
-    //         get_location(args.api_key.unwrap(), args.ip).await?;
-    //         return Ok(());
-    //     }
-    //     Err(_) => {
-    //         // println!(
-    //         //     "`{}`. Make sure you set GEO_TOKEN or supply an API key",
-    //         //     msg
-    //         // );
-
-    //         let try_key = args.api_key.unwrap_or(String::from(""));
-    //         println!("{}", try_key);
-    //         return Ok(());
-    //         // if try_key == None {
-    //         //     println!("Please provide an API key or supply a GEO_TOKEN environment variable");
-    //         //     return Ok(());
-    //         // }
-    //         get_location(try_key, args.ip).await?;
-    //         Ok(())
-    //     }
-    // }
 }
