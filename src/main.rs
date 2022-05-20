@@ -27,12 +27,13 @@ async fn get_location(api_key: String, ip: String) -> Result<(), Box<dyn std::er
     match response {
         Ok(resp) => {
             let serialized: serde_json::Map<String, Value> =
-                serde_json::from_str(&resp.text().await?).unwrap();
+                serde_json::from_str(&resp.text().await?)?;
             println!("{}", serde_json::to_string_pretty(&serialized).unwrap());
             return Ok(());
         }
+
         Err(e) => {
-            println!("{}", e);
+            eprintln!("{}", e);
             return Ok(());
         }
     };
@@ -47,13 +48,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             get_location(key_from_arg, args.ip).await?;
             return Ok(());
         }
+
         None => match std::env::var("GEO_TOKEN") {
             Ok(key_from_env) => {
                 get_location(key_from_env, args.ip).await?;
                 return Ok(());
             }
+
             Err(msg) => {
-                println!("{}", msg);
+                eprintln!("{}", msg);
                 return Ok(());
             }
         },
