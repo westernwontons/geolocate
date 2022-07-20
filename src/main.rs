@@ -8,7 +8,7 @@ use serde_json::Value;
 #[clap(about = "Fetches geolocation data", long_about = None)]
 struct Args {
     /// The IP you want to fetch geolocation data about
-    #[clap(short = 'i', long = "ip")]
+    #[clap(index = 1)]
     ip: String,
 
     /// Your API key from `https://ipgeolocation.io`
