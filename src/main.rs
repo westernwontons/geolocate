@@ -22,18 +22,19 @@ async fn get_location(api_key: String, ip: String) -> Result<(), Box<dyn std::er
         api_key, ip
     );
 
-    let response = reqwest::get(url).await;
-
-    match response {
-        Ok(resp) => {
+    match reqwest::get(url).await {
+        Ok(response) => {
             let serialized: serde_json::Map<String, Value> =
-                serde_json::from_str(&resp.text().await?)?;
-            println!("{}", serde_json::to_string_pretty(&serialized).unwrap());
+                serde_json::from_str(&response.text().await?)?;
+            let printable = serde_json::to_string_pretty(&serialized).ok();
+            println!(
+                "{}",
+                printable.unwrap_or("String prettifying failed".to_string())
+            );
             return Ok(());
         }
-
-        Err(e) => {
-            eprintln!("{}", e);
+        Err(error) => {
+            eprintln!("{}", error);
             return Ok(());
         }
     };
@@ -46,18 +47,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match args.api_key {
         Some(key_from_arg) => {
             get_location(key_from_arg, args.ip).await?;
-            return Ok(());
+            Ok(())
         }
 
         None => match std::env::var("GEO_TOKEN") {
             Ok(key_from_env) => {
                 get_location(key_from_env, args.ip).await?;
-                return Ok(());
+                Ok(())
             }
 
             Err(msg) => {
                 eprintln!("{}", msg);
-                return Ok(());
+                Ok(())
             }
         },
     }
