@@ -1,23 +1,22 @@
 pub mod get_location {
 
-  use std::borrow::Cow;
-
   use clap::Parser;
   use serde_json::{from_str, to_string_pretty, Map, Value};
+  use std::borrow::Cow;
 
   #[derive(Parser, Debug)]
   #[clap(name = "Geolocate")]
   #[clap(version = "0.2.0")]
   #[clap(author = "Nagy Botond")]
   #[clap(about = "Fetches geolocation data", long_about = None)]
-  pub struct Args {
+  struct Args {
     /// The IP you want to fetch geolocation data about
     #[clap(index = 1)]
-    pub ip: String,
+    ip: String,
 
     /// Your API key from `https://ipgeolocation.io`
     #[clap(short = 'k', long = "key")]
-    pub api_key: Option<String>,
+    api_key: Option<String>,
   }
 
   /// Fetches the JSON response or prints an error message if any
