@@ -19,7 +19,7 @@ pub mod get_location {
     api_key: Option<String>,
   }
 
-  /// Fetches the JSON response or prints an error message if any
+  /// Fetches the JSON response and returns that or any errors that might have occured
   async fn get_location<'a>(api_key: &str, ip: &str) -> Result<String, Box<dyn std::error::Error>> {
     let url = format!(
       "https://api.ipgeolocation.io/ipgeo?apiKey={}&ip={}",
