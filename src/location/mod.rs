@@ -37,7 +37,7 @@ pub mod get_location {
   }
 
   /// Shows where the given IP address points to
-  pub async fn ip_points_to() -> Result<Cow<'static, str>, Box<dyn std::error::Error>> {
+  pub async fn ip_points_to<'a>() -> Result<Cow<'a, str>, Box<dyn std::error::Error>> {
     let args = Args::parse();
 
     // if the GEO_TOKEN env is not set, get it from args
