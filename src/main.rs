@@ -1,4 +1,3 @@
-#![feature(box_into_inner)]
 pub mod location;
 
 use crate::location::get_location::ip_points_to;
