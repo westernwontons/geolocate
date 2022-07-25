@@ -16,3 +16,6 @@ tokio = { version = "1.18.2", features = ["full"] }
 
 [profile.release]
 rustflags = ["--emit=asm"]
+
+[profile.bench]
+debug = true
