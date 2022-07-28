@@ -2,9 +2,9 @@ pub mod location;
 
 use crate::location::get_location::ip_points_to;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-  match ip_points_to().await {
+// #[tokio::main]
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+  match ip_points_to() {
     Ok(ip_points_to) => {
       println!("{}", ip_points_to);
       Ok(())
