@@ -20,7 +20,7 @@ pub mod get_location {
   }
 
   /// Fetches the JSON response and returns that or any errors that might have occured
-  fn get_location<'a>(api_key: &str, ip: &str) -> Result<String, Box<dyn std::error::Error>> {
+  fn get_location<'a>(api_key: &str, ip: &str) -> reqwest::Result<String> {
     let url = format!(
       "https://api.ipgeolocation.io/ipgeo?apiKey={}&ip={}",
       api_key, ip
@@ -28,8 +28,8 @@ pub mod get_location {
 
     match reqwest::blocking::get(url)?.text() {
       Ok(response) => {
-        let serialized: Map<String, Value> = from_str(&response)?;
-        Ok(to_string_pretty(&serialized)?)
+        let serialized: Map<String, Value> = from_str(&response).expect("Failed to parse JSON");
+        Ok(to_string_pretty(&serialized).expect("Failed to prettify JSON"))
       }
 
       Err(err) => Err(err.into()),
@@ -37,7 +37,7 @@ pub mod get_location {
   }
 
   /// Shows where the given IP address points to
-  pub fn ip_points_to<'a>() -> Result<Cow<'a, str>, Box<dyn std::error::Error>> {
+  pub fn ip_points_to<'a>() -> reqwest::Result<Cow<'a, str>> {
     let args = Args::parse();
 
     // if the GEO_TOKEN env is not set, get it from args
