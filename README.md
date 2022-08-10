@@ -1,13 +1,41 @@
 # Geolocate
 
+## Overview
+
+The `geolocate` program uses the https://ipgeolocation.io API to fetch geodata of a given IP (IPv4) address. The data returned by the API is in JSON format.
+
 ## Install
 
-If you have `cargo` installed, you can `cargo install --git https://github.com/westernwontons/geolocate`. I would also recommend [topgrade](http://github.com/r-darwish/topgrade) if you haven't heard of it. 
+The easiest way to install the `geolocate` program is via `cargo`. If you have `cargo` installed on your system, you can simply run `cargo install --git https://github.com/westernwontons/geolocate` in a terminal. I would also recommend [topgrade](https://github.com/r-darwish/topgrade) if you haven't heard of it. 
 
-Give it an IP and get back geolocation data. It uses the https://ipgeolocation.io API to fetch the geodata.
-You need an API key and there's a free tier. Save the API key into an environment variable named `GEO_DATA` and `geolocate` will read it from there.
+In case you do not have `cargo` on your system, you can get it from the [official site](https://rustup.rs) .
 
-If you have `jq` on your system, you can pipe the returned JSON there for pretty colors. If you wish to do this, paste this into your `zshrc, bashrc` or whichever shell you use:
+## Usage
+
+To fetch geodata about an IP address you first need to register yourslef at https://ipgeolocation.io/signup.html to receive an API key, there's a free tier. After you have the key open a terminal and type in the follownig command:
+
+`geolocate IP_Address -k API_Token`
+
+In case you do not want to copy - paste the token every time you want to use the program, save the API key into an environment variable named `GEO_DATA` and `geolocate` will read it from there.
+
+If you have `jq` on your system, you can pipe the returned JSON data there for pretty colors: `geolocation IP -k API_Token | jq`. 
+
+If you wish to do this via `bash` function, paste the below function into your `.zshrc, .bashrc` or whichever shell you use:
+```bash
+# geolocate #
+geoloc() {
+	if  [[ -z $1 ]]; then
+		geolocate --help
+
+	else
+		geolocate "$1" -k "$2" 2>&1 | jq
+	fi
+}
+```
+
+Save and exit the file. Now you either restart your terminal session or simply reload the \.\*rc file with the `source ~/.*rc` command.
+
+If you saved the token into the `GEO_DATA` environment variable then the above bash function should look like the one below:
 ```bash
 # geolocate #
 geoloc() {
@@ -19,6 +47,7 @@ geoloc() {
 	fi
 }
 ```
+Save and exit the file and restart your terminal session or simply reload the \.\*rc file with the `source ~/.*rc` command.
 
 ### ip2location.io support
 
