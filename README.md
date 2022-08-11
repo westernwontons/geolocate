@@ -20,22 +20,7 @@ In case you do not want to copy - paste the token every time you want to use the
 
 If you have `jq` on your system, you can pipe the returned JSON data there for pretty colors: `geolocation IP -k API_Token | jq`. 
 
-If you wish to do this via `bash` function, paste the below function into your `.zshrc, .bashrc` or whichever shell you use:
-```bash
-# geolocate #
-geoloc() {
-	if  [[ -z $1 ]]; then
-		geolocate --help
-
-	else
-		geolocate "$1" -k "$2" 2>&1 | jq
-	fi
-}
-```
-
-Save and exit the file. Now you either restart your terminal session or simply reload the \.\*rc file with the `source ~/.*rc` command.
-
-If you saved the token into the `GEO_DATA` environment variable then the above bash function should look like the one below:
+If you wish to do this via `bash` function, paste the below lines into your `.zshrc, .bashrc` or whichever shell you use:
 ```bash
 # geolocate #
 geoloc() {
@@ -47,7 +32,9 @@ geoloc() {
 	fi
 }
 ```
-Save and exit the file and restart your terminal session or simply reload the \.\*rc file with the `source ~/.*rc` command.
+
+Save and exit the file. Now you either restart your terminal session or simply reload the \.\*rc file with the `source ~/.*rc` command.
+Please note, that for the function to work you have to save your token into the `GEO_DATA` environment variable.
 
 ### ip2location.io support
 
