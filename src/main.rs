@@ -1,5 +1,3 @@
-#![allow(clippy::module_inception)]
-
 use clap::Parser;
 use geolocate::{
     fetch_from_provider, read_or_modify_configuration, ApiKeyStore,
