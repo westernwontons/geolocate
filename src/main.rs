@@ -1,4 +1,4 @@
-use std::{fs::read_to_string, process::Command};
+#![allow(clippy::module_inception)]
 
 use clap::Parser;
 use geolocate::{
@@ -6,6 +6,7 @@ use geolocate::{
     ExclusiveGeolocationArgument, Geolocation, MutualExclusivity, Provider,
     Subcommands
 };
+use std::{fs::read_to_string, process::Command};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

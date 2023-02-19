@@ -46,7 +46,7 @@ impl Geolocation {
             Err(_) => return Err(GeolocationBuildError::TokenMissingError)
         };
 
-        if ip_addresses.len() < 1 {
+        if ip_addresses.is_empty() {
             return Err(GeolocationBuildError::NoIpAddressProvidedError);
         }
 
@@ -66,15 +66,14 @@ impl Geolocation {
     ) -> Result<Self, GeolocationBuildError> {
         let content = read_to_string(file)?;
         let mut ip_addresses = content
-            .split_terminator("\n")
-            .into_iter()
+            .split_terminator('\n')
             .map(|item| item.parse::<IpAddr>());
         if ip_addresses.by_ref().any(|item| item.is_err()) {
             return Err(GeolocationBuildError::InvalidIpAddress);
         }
 
         Geolocation::try_new(
-            ip_addresses.into_iter().map(|item| item.unwrap()).collect(),
+            ip_addresses.map(|item| item.unwrap()).collect(),
             provider,
             store,
             client
