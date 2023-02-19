@@ -1,13 +1,4 @@
-#![allow(
-    unused_variables,
-    unused_mut,
-    unused_imports,
-    dead_code,
-    unused_assignments
-)]
-
 use crate::config::ApiKeyStore;
-use serde::{Deserialize, Serialize};
 use std::{fs::read_to_string, net::IpAddr, path::PathBuf};
 
 #[derive(Clone, Debug)]
@@ -52,7 +43,7 @@ impl Geolocation {
 
         let api_key = match api_key {
             Ok(key) => key.to_owned(),
-            Err(err) => return Err(GeolocationBuildError::TokenMissingError)
+            Err(_) => return Err(GeolocationBuildError::TokenMissingError)
         };
 
         if ip_addresses.len() < 1 {
@@ -84,7 +75,7 @@ impl Geolocation {
 
         Geolocation::try_new(
             ip_addresses.into_iter().map(|item| item.unwrap()).collect(),
-            Provider::Ip2Location,
+            provider,
             store,
             client
         )
