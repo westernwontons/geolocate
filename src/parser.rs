@@ -1,4 +1,4 @@
-use crate::traits::MutualExclusivity;
+use crate::{traits::MutualExclusivity, GeolocationInput};
 use clap::{Args, Parser, Subcommand};
 use std::{net::IpAddr, path::PathBuf};
 
@@ -64,6 +64,16 @@ impl MutualExclusivity for Ip2LocationArguments {
     }
 }
 
+impl GeolocationInput for Ip2LocationArguments {
+    fn addrs(&mut self) -> Option<Vec<IpAddr>> {
+        self.addrs.take()
+    }
+
+    fn file(&mut self) -> Option<PathBuf> {
+        self.file.take()
+    }
+}
+
 #[derive(Debug, Args)]
 pub struct IpGeolocationArguments {
     /// IP Address to fetch geolocation data about. Can be IPv4 or IPv6
@@ -93,6 +103,16 @@ impl MutualExclusivity for IpGeolocationArguments {
                 )
             }
         }
+    }
+}
+
+impl GeolocationInput for IpGeolocationArguments {
+    fn addrs(&mut self) -> Option<Vec<IpAddr>> {
+        self.addrs.take()
+    }
+
+    fn file(&mut self) -> Option<PathBuf> {
+        self.file.take()
     }
 }
 
