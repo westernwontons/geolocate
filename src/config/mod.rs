@@ -1,3 +1,3 @@
 mod config;
 
-pub use config::ApiKeysStore;
+pub use config::ApiKeyStore;
