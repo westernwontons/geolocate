@@ -1,4 +1,4 @@
-use super::traits::MutualExclusivity;
+use crate::traits::MutualExclusivity;
 use clap::{Args, Parser, Subcommand};
 use std::{net::IpAddr, path::PathBuf};
 
