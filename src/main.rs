@@ -1,23 +1,10 @@
-#![allow(
-    unused_variables,
-    unused_mut,
-    unused_imports,
-    dead_code,
-    unused_assignments
-)]
+use std::{fs::read_to_string, process::Command};
 
-use std::{
-    fs::read_to_string,
-    net::{AddrParseError, IpAddr},
-    process::Command
-};
-
-use anyhow::Context;
 use clap::Parser;
 use geolocate::{
     ApiKeyStore, CommandLineArguments, ExclusiveConfigArgument,
-    ExclusiveGeolocationArgument, Geolocation, GeolocationBuildError,
-    MutualExclusivity, Provider, Subcommands
+    ExclusiveGeolocationArgument, Geolocation, MutualExclusivity, Provider,
+    Subcommands
 };
 
 #[tokio::main]
