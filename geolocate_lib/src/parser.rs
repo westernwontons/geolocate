@@ -24,7 +24,8 @@ pub enum Subcommands {
     Config(ConfigArguments),
 
     /// Generate shell completions
-    Completions,
+    #[command(subcommand)]
+    Completions(ShellCompletions),
 }
 
 #[derive(Debug, Args)]
@@ -155,4 +156,18 @@ impl MutualExclusivity for ConfigArguments {
             }
         }
     }
+}
+
+#[derive(Debug, Subcommand)]
+pub enum ShellCompletions {
+    Bash(OutDir),
+    Zsh(OutDir),
+    Fish(OutDir),
+    PowerShell(OutDir),
+    Elvish(OutDir),
+}
+
+#[derive(Debug, Args)]
+pub struct OutDir {
+    pub path: Option<PathBuf>,
 }

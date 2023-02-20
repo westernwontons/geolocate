@@ -1,4 +1,5 @@
 use geolocate_lib::{
+    completions::generate_shell_completions,
     geolocation::Provider,
     helpers::{
         fetch_from_provider, load_configuration, read_or_modify_configuration,
@@ -37,8 +38,10 @@ async fn main() -> anyhow::Result<()> {
             read_or_modify_configuration(arguments)
         }
 
-        Subcommands::Completions => {
-            todo!();
+        Subcommands::Completions(shell) => {
+            let path = generate_shell_completions(shell)?;
+            println!("Generated shell completions to: {}", path.display());
+            anyhow::Ok(())
         }
     }?;
 
