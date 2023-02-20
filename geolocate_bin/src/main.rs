@@ -38,11 +38,7 @@ async fn main() -> anyhow::Result<()> {
             read_or_modify_configuration(arguments)
         }
 
-        Subcommands::Completions(shell) => {
-            let path = generate_shell_completions(shell)?;
-            println!("Generated shell completions to: {}", path.display());
-            anyhow::Ok(())
-        }
+        Subcommands::Completions(shell) => generate_shell_completions(shell),
     }?;
 
     anyhow::Ok(())

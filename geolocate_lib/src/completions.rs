@@ -6,10 +6,12 @@ use std::path::PathBuf;
 
 pub fn generate_shell_completions(
     shell: ShellCompletions,
-) -> anyhow::Result<PathBuf> {
+) -> anyhow::Result<()> {
     let shell_name = match_shell(shell);
     let mut cmd = build_cli();
-    generate_completions_to(shell_name, &mut cmd)
+    let path = generate_completions_to(shell_name, &mut cmd)?;
+    println!("Generated shell completions to: {}", path.display());
+    anyhow::Ok(())
 }
 
 fn default_dir(outdir: Option<PathBuf>) -> PathBuf {
