@@ -286,8 +286,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "geolocate_lib"
-version = "4.0.0"
+name = "geolocate"
+version = "4.0.1"
 dependencies = [
  "anyhow",
  "clap",
