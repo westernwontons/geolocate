@@ -1,9 +1,6 @@
 [workspace]
 members = [
-	"geolocate_bin",
+	"geolocate",
 	"geolocate_lib"
 ]
 resolver = "2"
-
-[profile.bench]
-debug = true

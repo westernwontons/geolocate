@@ -1,5 +1,5 @@
 [package]
-name = "geolocate_bin"
+name = "geolocate"
 version = "3.0.1"
 edition = "2021"
 authors = ["Nagy Botond benjiwonton@gmail.com"]
@@ -16,6 +16,3 @@ geolocate_lib = {path = "../geolocate_lib", version = "3.0.1"}
 serde_json = "1.0.93"
 tokio = { version = "1.25.0", features = ["macros"] }
 
-[[bin]]
-name = "geolocate"
-path = "src/bin/geolocate.rs"
