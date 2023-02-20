@@ -145,21 +145,15 @@ pub enum ExclusiveConfigArgument {
 pub struct ConfigArguments {
     /// Print the configuration file's contents
     #[arg(short, long)]
-    show: bool,
+    pub show: bool,
 
     /// Edit the configuration file
     #[arg(short, long)]
-    edit: bool,
+    pub edit: bool,
 
     /// Print the path to the configuration file
     #[arg(long)]
-    print_path: bool,
-}
-
-impl ConfigArguments {
-    pub fn print_path(&self) -> bool {
-        self.print_path
-    }
+    pub print_path: bool,
 }
 
 impl MutualExclusivity for ConfigArguments {

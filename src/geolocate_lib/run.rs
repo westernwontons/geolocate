@@ -13,15 +13,16 @@ use crate::geolocate_lib::{
 
 pub async fn run() -> anyhow::Result<()> {
     let args = CommandLineArguments::parse();
-    if let Err(error) = load_configuration() {
-        match error {
+    let store = match load_configuration() {
+        Ok(conf) => Ok(conf),
+        Err(error) => match error {
             ConfyError::BadTomlData(_) => {
-                open_config_file_with_preferred_editor()?
+                open_config_file_with_preferred_editor()?;
+                load_configuration()
             }
-            err => anyhow::bail!("{}", err),
-        }
-    };
-    let store = load_configuration()?;
+            err => Err(err),
+        },
+    }?;
 
     match args.command {
         Command::Ip2location(arguments) => fetch_from_provider::<
@@ -37,7 +38,7 @@ pub async fn run() -> anyhow::Result<()> {
         .await,
 
         Command::Config(arguments) => {
-            if arguments.print_path() {
+            if arguments.print_path {
                 return print_configuration_file_path();
             }
             read_or_modify_configuration(arguments)
