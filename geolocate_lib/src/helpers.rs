@@ -2,6 +2,7 @@ use std::{fs::read_to_string, net::IpAddr, path::PathBuf, process::Command};
 
 use anyhow::Context;
 use confy::ConfyError;
+use json_color::Colorizer;
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
@@ -32,8 +33,7 @@ where
                 let mut geolocation =
                     Geolocation::new(arguments.addrs().unwrap(), api_key);
                 let data = geolocation.fetch::<E>(provider).await?;
-                println!("{}", serde_json::to_string_pretty(&data)?);
-                Ok(())
+                colorize_json(data)
             }
 
             ExclusiveGeolocationArgument::File => {
@@ -51,8 +51,7 @@ where
                 let api_key = store.get_provider_token(&provider)?;
                 let mut geolocation = Geolocation::new(ip_addrs, api_key);
                 let data = geolocation.fetch::<E>(provider).await?;
-                println!("{}", serde_json::to_string_pretty(&data)?);
-                Ok(())
+                colorize_json(data)
             }
         },
 
@@ -61,6 +60,16 @@ where
             Ok(())
         }
     }
+}
+
+pub fn colorize_json<E>(json_string: Vec<E>) -> anyhow::Result<()>
+where
+    E: Serialize,
+{
+    let colorizer = Colorizer::arbitrary();
+    let json = serde_json::to_string_pretty(&json_string)?;
+    println!("{}", colorizer.colorize_json_str(&json)?);
+    Ok(())
 }
 
 /// Read or modify the configuration file where the API keys are stored
@@ -142,14 +151,20 @@ where
     Ok(results)
 }
 
+/// Loads the configuration file for the API tokens for each provider
 pub fn load_configuration() -> Result<ApiKeyStore, ConfyError> {
     confy::load::<ApiKeyStore>("geolocate", None)
 }
 
-pub fn get_configuration_file_path() -> Result<PathBuf, confy::ConfyError> {
+/// Retrieves the path to the default configuration file
+pub fn get_configuration_file_path() -> Result<PathBuf, ConfyError> {
     confy::get_configuration_file_path("geolocate", None)
 }
 
+/// Opens the configuration file with the users preferred editor.
+/// The function will look for the $EDITOR env var and uses `nano`
+/// as a fallback. Geolocate will wait for the editor to close before
+/// doing anything else.
 pub fn open_config_file_with_preferred_editor() -> anyhow::Result<()> {
     let path = get_configuration_file_path()?;
     let editor = std::env::var("EDITOR").unwrap_or("nano".to_string());
@@ -157,6 +172,7 @@ pub fn open_config_file_with_preferred_editor() -> anyhow::Result<()> {
     Ok(())
 }
 
+/// Convenience function to print the path to the configuration file
 pub fn print_configuration_file_path() -> anyhow::Result<()> {
     println!("{}", get_configuration_file_path()?.display());
     Ok(())
