@@ -5,7 +5,7 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
     ApiKeyStore, ExclusiveConfigArgument, ExclusiveGeolocationArgument,
-    Geolocation, GeolocationInput, MutualExclusivity, Provider
+    Geolocation, GeolocationInput, MutualExclusivity, Provider,
 };
 
 /// Fetch geolocation data from a provider. The provider is determined
@@ -14,12 +14,12 @@ use crate::{
 pub async fn fetch_from_provider<T, E>(
     mut arguments: T,
     store: ApiKeyStore,
-    provider: Provider
+    provider: Provider,
 ) -> anyhow::Result<()>
 where
     T: MutualExclusivity<ExclusiveValue = ExclusiveGeolocationArgument>
         + GeolocationInput,
-    E: Serialize + DeserializeOwned + Send + 'static
+    E: Serialize + DeserializeOwned + Send + 'static,
 {
     let api_key = store.get_provider_token(&provider)?;
 
@@ -61,7 +61,7 @@ where
 /// Read or modify the configuration file where the API keys are stored
 pub fn read_or_modify_configuration<T>(arguments: T) -> anyhow::Result<()>
 where
-    T: MutualExclusivity<ExclusiveValue = ExclusiveConfigArgument>
+    T: MutualExclusivity<ExclusiveValue = ExclusiveConfigArgument>,
 {
     match arguments.check_exclusivity() {
         Ok(value) => match value {
@@ -95,7 +95,7 @@ where
 /// separated by newline. Each of them will be parsed, but note that the
 /// caller will have to handle any errors.
 pub fn read_ip_addresses_from_file(
-    file: PathBuf
+    file: PathBuf,
 ) -> anyhow::Result<Vec<anyhow::Result<IpAddr>>> {
     let ip_addresses = read_to_string(file)?
         .split_terminator('\n')
@@ -114,10 +114,10 @@ pub fn read_ip_addresses_from_file(
 /// Initiates requests concurrently.
 pub async fn fetch_many<T>(
     urls: Vec<String>,
-    client: &reqwest::Client
+    client: &reqwest::Client,
 ) -> anyhow::Result<Vec<T>>
 where
-    T: Serialize + DeserializeOwned + Send + 'static
+    T: Serialize + DeserializeOwned + Send + 'static,
 {
     let urls_len = urls.len();
     let futures = urls
@@ -135,4 +135,9 @@ where
         results.push(future.await??);
     }
     anyhow::Ok(results)
+}
+
+pub fn load_configuration() -> anyhow::Result<ApiKeyStore> {
+    confy::load::<ApiKeyStore>("geolocate", None)
+        .map_err(|err| anyhow::anyhow!("{}", err))
 }

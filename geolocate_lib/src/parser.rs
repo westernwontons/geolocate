@@ -6,7 +6,7 @@ use std::{net::IpAddr, path::PathBuf};
 #[command(author, version, about, long_about = None)]
 pub struct CommandLineArguments {
     #[command(subcommand)]
-    pub commands: Subcommands
+    pub command: Subcommands,
 }
 
 #[derive(Debug, Subcommand)]
@@ -21,7 +21,10 @@ pub enum Subcommands {
 
     /// Print the current configuration
     #[command(arg_required_else_help = true)]
-    Config(ConfigArguments)
+    Config(ConfigArguments),
+
+    /// Generate shell completions
+    Completions,
 }
 
 #[derive(Debug, Args)]
@@ -32,7 +35,7 @@ pub struct Ip2LocationArguments {
 
     /// File to read IP addresses from
     #[arg(short, long)]
-    pub file: Option<PathBuf>
+    pub file: Option<PathBuf>,
 }
 
 /// Arguments to the geolocation data providers are meant to be exclusive.
@@ -40,7 +43,7 @@ pub struct Ip2LocationArguments {
 /// newline delimited list of IP addresses
 pub enum ExclusiveGeolocationArgument {
     IpAddresses,
-    File
+    File,
 }
 
 impl MutualExclusivity for Ip2LocationArguments {
@@ -84,7 +87,7 @@ pub struct IpGeolocationArguments {
 
     /// File to read IP addresses from
     #[arg(short, long)]
-    pub file: Option<PathBuf>
+    pub file: Option<PathBuf>,
 }
 
 impl MutualExclusivity for IpGeolocationArguments {
@@ -123,7 +126,7 @@ impl GeolocationInput for IpGeolocationArguments {
 /// or it's opened in the users favourite editor
 pub enum ExclusiveConfigArgument {
     Show,
-    Edit
+    Edit,
 }
 
 #[derive(Debug, Args)]
@@ -134,7 +137,7 @@ pub struct ConfigArguments {
 
     /// Edit the configuration file
     #[arg(short, long)]
-    edit: bool
+    edit: bool,
 }
 
 impl MutualExclusivity for ConfigArguments {

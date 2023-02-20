@@ -1,15 +1,14 @@
-use clap::Parser;
-use geolocate::{
-    fetch_from_provider, read_or_modify_configuration, ApiKeyStore,
-    CommandLineArguments, Provider, Subcommands,
+use geolocate_lib::{
+    fetch_from_provider, load_configuration, read_or_modify_configuration,
+    CommandLineArguments, Parser, Provider, Subcommands,
 };
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let args = CommandLineArguments::parse();
-    let store = confy::load::<ApiKeyStore>("geolocate", None)?;
+    let store = load_configuration()?;
 
-    match args.commands {
+    match args.command {
         Subcommands::Ip2location(arguments) => fetch_from_provider::<
             _,
             serde_json::Map<String, serde_json::Value>,
@@ -32,6 +31,10 @@ async fn main() -> anyhow::Result<()> {
 
         Subcommands::Config(arguments) => {
             read_or_modify_configuration(arguments)
+        }
+
+        Subcommands::Completions => {
+            todo!();
         }
     }?;
 
