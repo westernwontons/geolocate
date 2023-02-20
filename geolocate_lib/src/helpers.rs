@@ -84,10 +84,9 @@ where
             ExclusiveConfigArgument::Show => {
                 let path =
                     confy::get_configuration_file_path("geolocate", None)?;
-
-                let content = read_to_string(path)?;
-                let toml_data = toml::from_str::<ApiKeyStore>(content.trim())?;
-
+                let toml_data = toml::from_str::<ApiKeyStore>(
+                    read_to_string(path)?.trim(),
+                )?;
                 toml_data.print_key_value_pairs()?;
                 anyhow::Ok(())
             }
