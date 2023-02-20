@@ -4,7 +4,7 @@ use geolocate_lib::{
         fetch_from_provider, load_configuration, read_or_modify_configuration,
     },
     parser::{CommandLineArguments, Subcommands},
-    Parser,
+    reexport::Parser,
 };
 
 #[tokio::main]

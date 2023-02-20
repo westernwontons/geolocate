@@ -6,4 +6,6 @@ pub mod helpers;
 pub mod parser;
 pub mod traits;
 
-pub use clap::Parser;
+pub mod reexport {
+    pub use clap::Parser;
+}
