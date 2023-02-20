@@ -1,6 +1,6 @@
 [package]
 name = "geolocate"
-version = "3.0.1"
+version = "3.0.2"
 edition = "2021"
 authors = ["Nagy Botond benjiwonton@gmail.com"]
 description = "A CLI for geolocation data providers"
