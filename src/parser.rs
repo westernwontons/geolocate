@@ -27,7 +27,7 @@ pub enum Subcommands {
 #[derive(Debug, Args)]
 pub struct Ip2LocationArguments {
     /// IP Address to fetch geolocation data about. Can be IPv4 or IPv6
-    #[arg(short, long)]
+    #[arg(short, long, num_args = 1.., value_delimiter = ' ')]
     pub addrs: Option<Vec<IpAddr>>,
 
     /// File to read IP addresses from
@@ -64,6 +64,8 @@ impl MutualExclusivity for Ip2LocationArguments {
     }
 }
 
+/// Both addrs or file whenever are used are consumed
+/// and there's no need to keep them around.
 impl GeolocationInput for Ip2LocationArguments {
     fn addrs(&mut self) -> Option<Vec<IpAddr>> {
         self.addrs.take()
@@ -77,7 +79,7 @@ impl GeolocationInput for Ip2LocationArguments {
 #[derive(Debug, Args)]
 pub struct IpGeolocationArguments {
     /// IP Address to fetch geolocation data about. Can be IPv4 or IPv6
-    #[arg(short, long)]
+    #[arg(short, long, num_args = 1.., value_delimiter = ' ')]
     pub addrs: Option<Vec<IpAddr>>,
 
     /// File to read IP addresses from

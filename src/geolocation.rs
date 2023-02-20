@@ -1,119 +1,137 @@
-use crate::config::ApiKeyStore;
-use std::{fs::read_to_string, net::IpAddr, path::PathBuf};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use std::{fmt::Display, net::IpAddr};
 
-#[derive(Clone, Debug)]
+use crate::helpers::fetch_many;
+
+/// The supported geolocation data providers.
+/// Their API will be used to fetch geo data from.
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub enum Provider {
     Ip2Location,
     IpGeolocation
 }
 
-#[derive(thiserror::Error, Debug)]
-pub enum GeolocationBuildError {
-    #[error(transparent)]
-    ConfigurationLoadError(#[from] confy::ConfyError),
-    #[error("API token is missing")]
-    TokenMissingError,
-    #[error("Must provide at least one IP address")]
-    NoIpAddressProvidedError,
-    #[error("File is not good")]
-    FileNotGood(#[from] std::io::Error),
-    #[error("Invalid IP address in file")]
-    InvalidIpAddress
+impl Display for Provider {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Provider::Ip2Location => write!(f, "ip2location"),
+            Provider::IpGeolocation => write!(f, "ipgeolocation")
+        }
+    }
 }
 
+/// Represents the operation of geolocation.
+/// Give it IP address/addresses and an API key
+/// and will give you geolocation data.
 #[derive(Clone, Debug)]
 pub struct Geolocation {
-    ip_addresses: Vec<IpAddr>,
+    ip_addrs: Vec<IpAddr>,
     api_key: String,
-    client: reqwest::Client,
-    provider: Provider
+    client: reqwest::Client
 }
 
 impl Geolocation {
-    pub fn try_new(
-        ip_addresses: Vec<IpAddr>,
-        provider: Provider,
-        store: ApiKeyStore,
-        client: reqwest::Client
-    ) -> Result<Self, GeolocationBuildError> {
-        let api_key = match provider {
-            Provider::Ip2Location => store.ip2location(),
-            Provider::IpGeolocation => store.ipgeolocation()
-        };
-
-        let api_key = match api_key {
-            Ok(key) => key.to_owned(),
-            Err(_) => return Err(GeolocationBuildError::TokenMissingError)
-        };
-
-        if ip_addresses.is_empty() {
-            return Err(GeolocationBuildError::NoIpAddressProvidedError);
-        }
-
-        Ok(Self {
-            ip_addresses,
+    pub fn new(ip_addrs: Vec<IpAddr>, api_key: String) -> Self {
+        Self {
+            ip_addrs,
             api_key,
-            client,
-            provider
-        })
-    }
-
-    pub fn try_new_from_file(
-        file: PathBuf,
-        provider: Provider,
-        store: ApiKeyStore,
-        client: reqwest::Client
-    ) -> Result<Self, GeolocationBuildError> {
-        let content = read_to_string(file)?;
-        let mut ip_addresses = content
-            .split_terminator('\n')
-            .map(|item| item.parse::<IpAddr>());
-        if ip_addresses.by_ref().any(|item| item.is_err()) {
-            return Err(GeolocationBuildError::InvalidIpAddress);
+            client: reqwest::Client::new()
         }
-
-        Geolocation::try_new(
-            ip_addresses.map(|item| item.unwrap()).collect(),
-            provider,
-            store,
-            client
-        )
     }
 
-    /// Fetch the geolocation data from a provider
-    pub async fn fetch(
-        &self
-    ) -> Result<serde_json::Map<String, serde_json::Value>, reqwest::Error>
+    /// Fetch geolocation data from a provider.
+    pub async fn fetch<T>(
+        &mut self,
+        provider: Provider
+    ) -> anyhow::Result<Vec<T>>
+    where
+        T: Serialize + DeserializeOwned + Send + 'static
     {
-        match self.provider {
-            Provider::Ip2Location => {
-                self.client
-                    .get(format!(
+        match provider {
+            Provider::Ip2Location => match self.ip_addrs.len() {
+                1 => {
+                    let url = format!(
                         "https://api.ip2location.io/?ip={}&key={}",
-                        self.ip_addresses.first().unwrap(),
+                        self.ip_addrs.first().unwrap(),
                         self.api_key
-                    ))
-                    .send()
-                    .await?
-                    .json::<serde_json::Map<String, serde_json::Value>>()
-                    .await
-            }
-            Provider::IpGeolocation => {
-                self.client
-                    .get(format!(
+                    );
+                    let json_result = self
+                        .client
+                        .get(url)
+                        .send()
+                        .await?
+                        .json::<T>()
+                        .await
+                        .map_err(|err| anyhow::anyhow!("{}", err));
+                    match json_result {
+                        Ok(json) => anyhow::Ok(vec![json]),
+                        Err(err) => anyhow::bail!("{}", err)
+                    }
+                }
+                _ => self.fetch_many(provider).await
+            },
+            Provider::IpGeolocation => match self.ip_addrs.len() {
+                1 => {
+                    let url = format!(
                         "https://api.ipgeolocation.io/ipgeo?apiKey={}&ip={}",
                         self.api_key,
-                        self.ip_addresses.first().unwrap()
-                    ))
-                    .send()
-                    .await?
-                    .json()
-                    .await
+                        self.ip_addrs.first().unwrap()
+                    );
+                    let json_result = self
+                        .client
+                        .get(url)
+                        .send()
+                        .await?
+                        .json::<T>()
+                        .await
+                        .map_err(|err| anyhow::anyhow!("{}", err));
+                    match json_result {
+                        Ok(json) => anyhow::Ok(vec![json]),
+                        Err(err) => anyhow::bail!("{}", err)
+                    }
+                }
+                _ => self.fetch_many(provider).await
             }
         }
     }
 
-    pub fn fetch_many() -> Vec<Result<serde_json::Value, reqwest::Error>> {
-        todo!()
+    /// Fetch geolocation data from a provider,
+    /// but for multiple IP addresses.
+    /// Initiates concurrent requests.
+    async fn fetch_many<T>(
+        &mut self,
+        provider: Provider
+    ) -> anyhow::Result<Vec<T>>
+    where
+        T: Serialize + DeserializeOwned + Send + 'static
+    {
+        match provider {
+            Provider::Ip2Location => {
+                let urls = self
+                    .ip_addrs
+                    .iter()
+                    .map(|ip_addr| {
+                        format!(
+                            "https://api.ip2location.io/?ip={}&key={}",
+                            ip_addr, self.api_key
+                        )
+                    })
+                    .collect::<Vec<String>>();
+                fetch_many(urls, &self.client).await
+            }
+
+            Provider::IpGeolocation => {
+                let urls = self.ip_addrs
+                    .iter()
+                    .map(|ip_addr| {
+                        format!(
+                            "https://api.ipgeolocation.io/ipgeo?apiKey={}&ip={}",
+                            self.api_key, ip_addr
+                        )
+                    })
+                    .collect::<Vec<String>>();
+                fetch_many(urls, &self.client).await
+            }
+        }
     }
 }

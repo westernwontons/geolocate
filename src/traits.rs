@@ -10,6 +10,11 @@ pub trait MutualExclusivity {
     fn check_exclusivity(&self) -> anyhow::Result<Self::ExclusiveValue>;
 }
 
+/// To send a successful request to any of the two geolocation data providers
+/// we need a minimum of one IP address, which is obtainable from the CLI
+/// or from a file. The `addrs` method is an `Option<Vec<IpAddr>>`, because
+/// `Clap` has a limitation, where you cannot specify an enum as a value
+/// to exclusively use from out of two options.
 pub trait GeolocationInput {
     fn addrs(&mut self) -> Option<Vec<IpAddr>>;
     fn file(&mut self) -> Option<PathBuf>;
