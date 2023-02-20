@@ -5,7 +5,7 @@ use std::{
     io::{stdout, BufWriter, Write},
 };
 
-use crate::geolocation::Provider;
+use crate::geolocate_lib::geolocation::Provider;
 
 /// Contains the API keys for geolocation data providers.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

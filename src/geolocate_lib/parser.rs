@@ -1,4 +1,4 @@
-use crate::{
+use crate::geolocate_lib::{
     geolocation::Provider,
     traits::{GeolocationInput, GeolocationProvider, MutualExclusivity},
 };

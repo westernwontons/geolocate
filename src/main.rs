@@ -1,3 +1,5 @@
+mod geolocate_lib;
+
 use geolocate_lib::run::run;
 
 #[tokio::main]

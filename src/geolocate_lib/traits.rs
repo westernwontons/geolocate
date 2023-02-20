@@ -1,6 +1,6 @@
 use std::{net::IpAddr, path::PathBuf};
 
-use crate::geolocation::Provider;
+use crate::geolocate_lib::geolocation::Provider;
 
 /// Clap doesn't allow enums to specify as command values unless
 /// the enum only has unit variants. MutualExclusivity defines the behaviour of

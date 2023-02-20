@@ -1,4 +1,4 @@
-use crate::helpers::fetch_many;
+use crate::geolocate_lib::helpers::fetch_many;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::{fmt::Display, net::IpAddr};
 

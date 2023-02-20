@@ -5,7 +5,7 @@ use confy::ConfyError;
 use json_color::Colorizer;
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::{
+use crate::geolocate_lib::{
     config::ApiKeyStore,
     geolocation::Geolocation,
     parser::{ExclusiveConfigArgument, ExclusiveGeolocationArgument},

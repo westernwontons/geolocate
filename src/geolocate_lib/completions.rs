@@ -1,5 +1,5 @@
-use crate::parser::ShellCompletions;
-use crate::{cli::build_cli, parser::OutDir};
+use crate::geolocate_lib::parser::ShellCompletions;
+use crate::geolocate_lib::{cli::build_cli, parser::OutDir};
 use clap::Command;
 use clap_complete::{generate_to, shells};
 use std::path::PathBuf;

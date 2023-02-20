@@ -1,7 +1,7 @@
 use clap::Parser;
 use confy::ConfyError;
 
-use crate::{
+use crate::geolocate_lib::{
     completions::generate_shell_completions,
     helpers::{
         fetch_from_provider, load_configuration,
