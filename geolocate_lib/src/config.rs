@@ -25,7 +25,7 @@ impl ApiKeyStore {
 
     pub fn print_key_value_pairs(&self) -> anyhow::Result<()> {
         let mut stdout = BufWriter::new(stdout());
-        stdout.write(b"\n")?;
+        stdout.write_all(b"\n")?;
         for (key, value) in self.0.clone().drain() {
             stdout.write_fmt(format_args!(
                 "{} = {}\n",
@@ -34,6 +34,6 @@ impl ApiKeyStore {
             ))?;
         }
         stdout.flush()?;
-        anyhow::Ok(())
+        Ok(())
     }
 }

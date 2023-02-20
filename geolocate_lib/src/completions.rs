@@ -11,7 +11,7 @@ pub fn generate_shell_completions(
     let mut cmd = build_cli();
     let path = generate_completions_to(shell_name, &mut cmd)?;
     println!("Generated shell completions to: {}", path.display());
-    anyhow::Ok(())
+    Ok(())
 }
 
 fn default_dir(outdir: Option<PathBuf>) -> PathBuf {
@@ -20,27 +20,27 @@ fn default_dir(outdir: Option<PathBuf>) -> PathBuf {
 
 fn generate_completions_to(
     shell_name: ShellName,
-    mut cmd: &mut Command,
+    cmd: &mut Command,
 ) -> anyhow::Result<PathBuf> {
     match shell_name {
         ShellName::Bash { name, outdir } => {
-            generate_to(name, &mut cmd, "geolocate", default_dir(outdir))
+            generate_to(name, cmd, "geolocate", default_dir(outdir))
                 .map_err(|error| anyhow::anyhow!("{}", error))
         }
         ShellName::Zsh { name, outdir } => {
-            generate_to(name, &mut cmd, "geolocate", default_dir(outdir))
+            generate_to(name, cmd, "geolocate", default_dir(outdir))
                 .map_err(|error| anyhow::anyhow!("{}", error))
         }
         ShellName::Fish { name, outdir } => {
-            generate_to(name, &mut cmd, "geolocate", default_dir(outdir))
+            generate_to(name, cmd, "geolocate", default_dir(outdir))
                 .map_err(|error| anyhow::anyhow!("{}", error))
         }
         ShellName::PowerShell { name, outdir } => {
-            generate_to(name, &mut cmd, "geolocate", default_dir(outdir))
+            generate_to(name, cmd, "geolocate", default_dir(outdir))
                 .map_err(|error| anyhow::anyhow!("{}", error))
         }
         ShellName::Elvish { name, outdir } => {
-            generate_to(name, &mut cmd, "geolocate", default_dir(outdir))
+            generate_to(name, cmd, "geolocate", default_dir(outdir))
                 .map_err(|error| anyhow::anyhow!("{}", error))
         }
     }

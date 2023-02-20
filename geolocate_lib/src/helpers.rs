@@ -33,7 +33,7 @@ where
                     Geolocation::new(arguments.addrs().unwrap(), api_key);
                 let data = geolocation.fetch::<E>(provider).await?;
                 println!("{}", serde_json::to_string_pretty(&data)?);
-                anyhow::Ok(())
+                Ok(())
             }
 
             ExclusiveGeolocationArgument::File => {
@@ -52,13 +52,13 @@ where
                 let mut geolocation = Geolocation::new(ip_addrs, api_key);
                 let data = geolocation.fetch::<E>(provider).await?;
                 println!("{}", serde_json::to_string_pretty(&data)?);
-                anyhow::Ok(())
+                Ok(())
             }
         },
 
         Err(err) => {
             eprintln!("{}", err);
-            anyhow::Ok(())
+            Ok(())
         }
     }
 }
@@ -73,9 +73,9 @@ where
             ExclusiveConfigArgument::Edit => {
                 let path =
                     confy::get_configuration_file_path("geolocate", None)?;
-                open_config_file_with_editor()?;
+                open_config_file_with_preferred_editor()?;
                 match toml::from_str::<ApiKeyStore>(&read_to_string(path)?) {
-                    Ok(_) => anyhow::Ok(()),
+                    Ok(_) => Ok(()),
                     Err(err) => anyhow::bail!("{}", err),
                 }
             }
@@ -86,12 +86,12 @@ where
                     read_to_string(path)?.trim(),
                 )?;
                 toml_data.print_key_value_pairs()?;
-                anyhow::Ok(())
+                Ok(())
             }
         },
         Err(err) => {
             eprintln!("{}", err);
-            anyhow::Ok(())
+            Ok(())
         }
     }
 }
@@ -112,7 +112,7 @@ pub fn read_ip_addresses_from_file(
         })
         .collect::<Vec<anyhow::Result<IpAddr>>>();
 
-    anyhow::Ok(ip_addresses)
+    Ok(ip_addresses)
 }
 
 /// Helper function to fetch geolocation data.
@@ -139,7 +139,7 @@ where
     for future in futures {
         results.push(future.await??);
     }
-    anyhow::Ok(results)
+    Ok(results)
 }
 
 pub fn load_configuration() -> Result<ApiKeyStore, ConfyError> {
@@ -150,7 +150,7 @@ pub fn get_configuration_file_path() -> Result<PathBuf, confy::ConfyError> {
     confy::get_configuration_file_path("geolocate", None)
 }
 
-pub fn open_config_file_with_editor() -> anyhow::Result<()> {
+pub fn open_config_file_with_preferred_editor() -> anyhow::Result<()> {
     let path = get_configuration_file_path()?;
     let editor = std::env::var("EDITOR").unwrap_or("nano".to_string());
     Command::new(editor).arg(&path).spawn()?.wait()?;
@@ -159,7 +159,7 @@ pub fn open_config_file_with_editor() -> anyhow::Result<()> {
 
 pub fn print_configuration_file_path() -> anyhow::Result<()> {
     println!("{}", get_configuration_file_path()?.display());
-    anyhow::Ok(())
+    Ok(())
 }
 
 #[cfg(test)]

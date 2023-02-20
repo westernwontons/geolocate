@@ -9,11 +9,11 @@ use std::{net::IpAddr, path::PathBuf};
 #[command(author, version, about, long_about = None)]
 pub struct CommandLineArguments {
     #[command(subcommand)]
-    pub command: Subcommands,
+    pub command: Command,
 }
 
 #[derive(Debug, Subcommand)]
-pub enum Subcommands {
+pub enum Command {
     /// Use the ip2location API
     #[command(arg_required_else_help = true)]
     Ip2location(Ip2LocationArguments),
@@ -55,10 +55,8 @@ impl MutualExclusivity for Ip2LocationArguments {
 
     fn check_exclusivity(&self) -> anyhow::Result<Self::ExclusiveValue> {
         match (self.addrs.as_deref(), self.file.as_deref()) {
-            (Some(_), None) => {
-                anyhow::Ok(ExclusiveGeolocationArgument::IpAddresses)
-            }
-            (None, Some(_)) => anyhow::Ok(ExclusiveGeolocationArgument::File),
+            (Some(_), None) => Ok(ExclusiveGeolocationArgument::IpAddresses),
+            (None, Some(_)) => Ok(ExclusiveGeolocationArgument::File),
             (Some(_), Some(_)) => anyhow::bail!(
                 "--file and --addrs arguments are mutually exclusive"
             ),
@@ -105,10 +103,8 @@ impl MutualExclusivity for IpGeolocationArguments {
 
     fn check_exclusivity(&self) -> anyhow::Result<Self::ExclusiveValue> {
         match (self.addrs.as_deref(), self.file.as_deref()) {
-            (Some(_), None) => {
-                anyhow::Ok(ExclusiveGeolocationArgument::IpAddresses)
-            }
-            (None, Some(_)) => anyhow::Ok(ExclusiveGeolocationArgument::File),
+            (Some(_), None) => Ok(ExclusiveGeolocationArgument::IpAddresses),
+            (None, Some(_)) => Ok(ExclusiveGeolocationArgument::File),
             (Some(_), Some(_)) => anyhow::bail!(
                 "--file and --addrs arguments are mutually exclusive"
             ),
@@ -161,11 +157,8 @@ pub struct ConfigArguments {
 }
 
 impl ConfigArguments {
-    pub fn print_path(&self) -> anyhow::Result<bool> {
-        if self.print_path {
-            return anyhow::Ok(true);
-        }
-        anyhow::Ok(false)
+    pub fn print_path(&self) -> bool {
+        self.print_path
     }
 }
 
@@ -174,8 +167,8 @@ impl MutualExclusivity for ConfigArguments {
 
     fn check_exclusivity(&self) -> anyhow::Result<Self::ExclusiveValue> {
         match (self.show, self.edit) {
-            (false, true) => anyhow::Ok(ExclusiveConfigArgument::Edit),
-            (true, false) => anyhow::Ok(ExclusiveConfigArgument::Show),
+            (false, true) => Ok(ExclusiveConfigArgument::Edit),
+            (true, false) => Ok(ExclusiveConfigArgument::Show),
             (true, true) => anyhow::bail!(
                 "Arguments --edit and --show are mutually exclusive"
             ),

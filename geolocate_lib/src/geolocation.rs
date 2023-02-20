@@ -63,7 +63,7 @@ impl Geolocation {
                         .await
                         .map_err(|err| anyhow::anyhow!("{}", err));
                     match json_result {
-                        Ok(json) => anyhow::Ok(vec![json]),
+                        Ok(json) => Ok(vec![json]),
                         Err(err) => anyhow::bail!("{}", err),
                     }
                 }
@@ -85,7 +85,7 @@ impl Geolocation {
                         .await
                         .map_err(|err| anyhow::anyhow!("{}", err));
                     match json_result {
-                        Ok(json) => anyhow::Ok(vec![json]),
+                        Ok(json) => Ok(vec![json]),
                         Err(err) => anyhow::bail!("{}", err),
                     }
                 }
