@@ -12,7 +12,7 @@ categories = ["command-line-utilities"]
 
 [dependencies]
 anyhow = "1.0.69"
-geolocate_lib = {path = "../geolocate_lib", version = "3.0.1"}
+geolocate_lib = {path = "../geolocate_lib", version = "3.0.2"}
 serde_json = "1.0.93"
 tokio = { version = "1.25.0", features = ["macros"] }
 
