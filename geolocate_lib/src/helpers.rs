@@ -1,6 +1,7 @@
 use std::{fs::read_to_string, net::IpAddr, path::PathBuf, process::Command};
 
 use anyhow::Context;
+use confy::ConfyError;
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
@@ -144,9 +145,19 @@ where
     anyhow::Ok(results)
 }
 
-pub fn load_configuration() -> anyhow::Result<ApiKeyStore> {
+pub fn load_configuration() -> Result<ApiKeyStore, ConfyError> {
     confy::load::<ApiKeyStore>("geolocate", None)
-        .map_err(|err| anyhow::anyhow!("{}", err))
+}
+
+pub fn get_configuration_file_path() -> Result<PathBuf, confy::ConfyError> {
+    confy::get_configuration_file_path("geolocate", None)
+}
+
+pub fn open_config_file_with_editor() -> anyhow::Result<()> {
+    let path = get_configuration_file_path()?;
+    let editor = std::env::var("EDITOR").unwrap_or("nano".to_string());
+    Command::new(editor).arg(&path).spawn()?.wait()?;
+    Ok(())
 }
 
 #[cfg(test)]

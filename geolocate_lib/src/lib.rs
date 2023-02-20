@@ -8,4 +8,5 @@ pub mod traits;
 
 pub mod reexport {
     pub use clap::Parser;
+    pub use confy::ConfyError;
 }

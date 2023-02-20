@@ -7,8 +7,47 @@
 		{
 			"type": "lldb",
 			"request": "launch",
-			"name": "Debug",
-			"program": "${workspaceFolder}/<executable file>",
+			"name": "Debug executable 'geolocate_bin'",
+			"cargo": {
+				"args": ["build", "--bin=geolocate_bin", "--package=geolocate_bin"],
+				"filter": {
+					"name": "geolocate_bin",
+					"kind": "bin"
+				}
+			},
+			"args": ["config", "-e"],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug unit tests in executable 'geolocate_bin'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bin=geolocate_bin",
+					"--package=geolocate_bin"
+				],
+				"filter": {
+					"name": "geolocate_bin",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug unit tests in library 'geolocate_lib'",
+			"cargo": {
+				"args": ["test", "--no-run", "--lib", "--package=geolocate_lib"],
+				"filter": {
+					"name": "geolocate_lib",
+					"kind": "lib"
+				}
+			},
 			"args": [],
 			"cwd": "${workspaceFolder}"
 		}

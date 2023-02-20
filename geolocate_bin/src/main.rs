@@ -1,15 +1,22 @@
 use geolocate_lib::{
     completions::generate_shell_completions,
     helpers::{
-        fetch_from_provider, load_configuration, read_or_modify_configuration,
+        fetch_from_provider, load_configuration, open_config_file_with_editor,
+        read_or_modify_configuration,
     },
     parser::{CommandLineArguments, Subcommands},
-    reexport::Parser,
+    reexport::{ConfyError, Parser},
 };
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let args = CommandLineArguments::parse();
+    if let Err(error) = load_configuration() {
+        match error {
+            ConfyError::BadTomlData(_) => open_config_file_with_editor()?,
+            err @ _ => anyhow::bail!("{}", err),
+        }
+    };
     let store = load_configuration()?;
 
     match args.command {
