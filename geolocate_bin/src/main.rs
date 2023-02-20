@@ -2,7 +2,7 @@ use geolocate_lib::{
     completions::generate_shell_completions,
     helpers::{
         fetch_from_provider, load_configuration, open_config_file_with_editor,
-        read_or_modify_configuration,
+        print_configuration_file_path, read_or_modify_configuration,
     },
     parser::{CommandLineArguments, Subcommands},
     reexport::{ConfyError, Parser},
@@ -33,6 +33,9 @@ async fn main() -> anyhow::Result<()> {
         .await,
 
         Subcommands::Config(arguments) => {
+            if arguments.print_path()? {
+                return anyhow::Ok(print_configuration_file_path()?);
+            }
             read_or_modify_configuration(arguments)
         }
 

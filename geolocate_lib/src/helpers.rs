@@ -71,11 +71,9 @@ where
     match arguments.check_exclusivity() {
         Ok(value) => match value {
             ExclusiveConfigArgument::Edit => {
-                let editor =
-                    std::env::var("EDITOR").unwrap_or("nano".to_string());
                 let path =
                     confy::get_configuration_file_path("geolocate", None)?;
-                Command::new(editor).arg(&path).spawn()?.wait()?;
+                open_config_file_with_editor()?;
                 match toml::from_str::<ApiKeyStore>(&read_to_string(path)?) {
                     Ok(_) => anyhow::Ok(()),
                     Err(err) => anyhow::bail!("{}", err),
@@ -83,8 +81,7 @@ where
             }
 
             ExclusiveConfigArgument::Show => {
-                let path =
-                    confy::get_configuration_file_path("geolocate", None)?;
+                let path = get_configuration_file_path()?;
                 let toml_data = toml::from_str::<ApiKeyStore>(
                     read_to_string(path)?.trim(),
                 )?;
@@ -158,6 +155,11 @@ pub fn open_config_file_with_editor() -> anyhow::Result<()> {
     let editor = std::env::var("EDITOR").unwrap_or("nano".to_string());
     Command::new(editor).arg(&path).spawn()?.wait()?;
     Ok(())
+}
+
+pub fn print_configuration_file_path() -> anyhow::Result<()> {
+    println!("{}", get_configuration_file_path()?.display());
+    anyhow::Ok(())
 }
 
 #[cfg(test)]

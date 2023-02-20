@@ -154,6 +154,19 @@ pub struct ConfigArguments {
     /// Edit the configuration file
     #[arg(short, long)]
     edit: bool,
+
+    /// Print the path to the configuration file
+    #[arg(long)]
+    print_path: bool,
+}
+
+impl ConfigArguments {
+    pub fn print_path(&self) -> anyhow::Result<bool> {
+        if self.print_path {
+            return anyhow::Ok(true);
+        }
+        anyhow::Ok(false)
+    }
 }
 
 impl MutualExclusivity for ConfigArguments {
