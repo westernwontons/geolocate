@@ -290,8 +290,6 @@ name = "geolocate_bin"
 version = "0.3.0"
 dependencies = [
  "anyhow",
- "clap",
- "clap_complete",
  "geolocate_lib",
  "serde_json",
  "tokio",
