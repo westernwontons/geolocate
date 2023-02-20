@@ -1,4 +1,7 @@
-use crate::traits::{GeolocationInput, MutualExclusivity};
+use crate::{
+    geolocation::Provider,
+    traits::{GeolocationInput, GeolocationProvider, MutualExclusivity},
+};
 use clap::{Args, Parser, Subcommand};
 use std::{net::IpAddr, path::PathBuf};
 
@@ -80,6 +83,12 @@ impl GeolocationInput for Ip2LocationArguments {
     }
 }
 
+impl GeolocationProvider for Ip2LocationArguments {
+    fn provider(&self) -> Provider {
+        Provider::Ip2Location
+    }
+}
+
 #[derive(Debug, Args)]
 pub struct IpGeolocationArguments {
     /// IP Address to fetch geolocation data about. Can be IPv4 or IPv6
@@ -119,6 +128,12 @@ impl GeolocationInput for IpGeolocationArguments {
 
     fn file(&mut self) -> Option<PathBuf> {
         self.file.take()
+    }
+}
+
+impl GeolocationProvider for IpGeolocationArguments {
+    fn provider(&self) -> Provider {
+        Provider::IpGeolocation
     }
 }
 

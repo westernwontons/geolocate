@@ -1,6 +1,5 @@
 use geolocate_lib::{
     completions::generate_shell_completions,
-    geolocation::Provider,
     helpers::{
         fetch_from_provider, load_configuration, read_or_modify_configuration,
     },
@@ -17,21 +16,13 @@ async fn main() -> anyhow::Result<()> {
         Subcommands::Ip2location(arguments) => fetch_from_provider::<
             _,
             serde_json::Map<String, serde_json::Value>,
-        >(
-            arguments,
-            store,
-            Provider::Ip2Location,
-        )
+        >(arguments, store)
         .await,
 
         Subcommands::Ipgeolocation(arguments) => fetch_from_provider::<
             _,
             serde_json::Map<String, serde_json::Value>,
-        >(
-            arguments,
-            store,
-            Provider::IpGeolocation,
-        )
+        >(arguments, store)
         .await,
 
         Subcommands::Config(arguments) => {

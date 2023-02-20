@@ -1,5 +1,7 @@
 use std::{net::IpAddr, path::PathBuf};
 
+use crate::geolocation::Provider;
+
 /// Clap doesn't allow enums to specify as command values unless
 /// the enum only has unit variants. MutualExclusivity defines the behaviour of
 /// checking for multiple flags passed and returns an error to tell the user
@@ -18,4 +20,11 @@ pub trait MutualExclusivity {
 pub trait GeolocationInput {
     fn addrs(&mut self) -> Option<Vec<IpAddr>>;
     fn file(&mut self) -> Option<PathBuf>;
+}
+
+/// Multiple providers are supported that have different
+/// query strings needed to build a request. The implementors
+/// of this trait should return their corresponding providers.
+pub trait GeolocationProvider {
+    fn provider(&self) -> Provider;
 }

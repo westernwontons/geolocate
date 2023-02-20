@@ -5,9 +5,9 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
     config::ApiKeyStore,
-    geolocation::{Geolocation, Provider},
+    geolocation::Geolocation,
     parser::{ExclusiveConfigArgument, ExclusiveGeolocationArgument},
-    traits::{GeolocationInput, MutualExclusivity},
+    traits::{GeolocationInput, GeolocationProvider, MutualExclusivity},
 };
 
 /// Fetch geolocation data from a provider. The provider is determined
@@ -16,18 +16,18 @@ use crate::{
 pub async fn fetch_from_provider<T, E>(
     mut arguments: T,
     store: ApiKeyStore,
-    provider: Provider,
 ) -> anyhow::Result<()>
 where
     T: MutualExclusivity<ExclusiveValue = ExclusiveGeolocationArgument>
-        + GeolocationInput,
+        + GeolocationInput
+        + GeolocationProvider,
     E: Serialize + DeserializeOwned + Send + 'static,
 {
-    let api_key = store.get_provider_token(&provider)?;
-
     match arguments.check_exclusivity() {
         Ok(value) => match value {
             ExclusiveGeolocationArgument::IpAddresses => {
+                let provider = arguments.provider();
+                let api_key = store.get_provider_token(&provider)?;
                 let mut geolocation =
                     Geolocation::new(arguments.addrs().unwrap(), api_key);
                 let data = geolocation.fetch::<E>(provider).await?;
@@ -46,6 +46,8 @@ where
                 }
                 let ip_addrs =
                     ip_addrs.into_iter().map(Result::unwrap).collect();
+                let provider = arguments.provider();
+                let api_key = store.get_provider_token(&provider)?;
                 let mut geolocation = Geolocation::new(ip_addrs, api_key);
                 let data = geolocation.fetch::<E>(provider).await?;
                 println!("{}", serde_json::to_string_pretty(&data)?);
