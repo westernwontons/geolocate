@@ -74,17 +74,21 @@ where
                     std::env::var("EDITOR").unwrap_or("nano".to_string());
                 let path =
                     confy::get_configuration_file_path("geolocate", None)?;
-                Command::new(editor).arg(path).spawn()?.wait()?;
-                anyhow::Ok(())
+                Command::new(editor).arg(&path).spawn()?.wait()?;
+                match toml::from_str::<ApiKeyStore>(&read_to_string(path)?) {
+                    Ok(_) => anyhow::Ok(()),
+                    Err(err) => anyhow::bail!("{}", err),
+                }
             }
 
             ExclusiveConfigArgument::Show => {
-                let config_file_path =
+                let path =
                     confy::get_configuration_file_path("geolocate", None)?;
 
-                let content = read_to_string(config_file_path)?;
+                let content = read_to_string(path)?;
+                let toml_data = toml::from_str::<ApiKeyStore>(content.trim())?;
 
-                println!("{}", content.trim());
+                toml_data.print_key_value_pairs()?;
                 anyhow::Ok(())
             }
         },
@@ -106,7 +110,7 @@ pub fn read_ip_addresses_from_file(
         .enumerate()
         .map(|(index, item)| {
             item.parse::<IpAddr>().with_context(|| {
-                format!("IP address at line {} is invalid", index)
+                format!("IP address at line {} is invalid", index + 1)
             })
         })
         .collect::<Vec<anyhow::Result<IpAddr>>>();
@@ -144,4 +148,46 @@ where
 pub fn load_configuration() -> anyhow::Result<ApiKeyStore> {
     confy::load::<ApiKeyStore>("geolocate", None)
         .map_err(|err| anyhow::anyhow!("{}", err))
+}
+
+#[cfg(test)]
+mod test {
+    use super::read_ip_addresses_from_file;
+    use std::path::PathBuf;
+
+    #[test]
+    fn ip_addrs_are_read_from_file_correctly() {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("tests")
+            .join("ip_addrs.txt");
+        let addrs = read_ip_addresses_from_file(path).unwrap();
+        assert!(addrs.iter().all(|item| item.is_ok()) == true)
+    }
+
+    #[test]
+    fn ip_addr_format_is_wrong() {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("tests")
+            .join("ip_addrs_with_error.txt");
+        let addr = read_ip_addresses_from_file(path).unwrap();
+        assert!(addr[1].is_err());
+        assert!(
+            addr[1].as_ref().unwrap_err().to_string()
+                == "IP address at line 2 is invalid"
+        )
+    }
+
+    #[test]
+    fn file_with_ip_addrs_doesnt_exist() {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("tests")
+            .join("doesntexist.txt");
+        assert!(read_ip_addresses_from_file(path).is_err())
+    }
 }
