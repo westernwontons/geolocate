@@ -186,7 +186,7 @@ mod test {
     #[test]
     fn ip_addrs_are_read_from_file_correctly() {
         let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("tests")
+            .join("test_files")
             .join("ip_addrs.txt");
         let addrs = read_ip_addresses_from_file(path).unwrap();
         assert!(addrs.iter().all(|item| item.is_ok()) == true)
@@ -195,7 +195,7 @@ mod test {
     #[test]
     fn ip_addr_format_is_wrong() {
         let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("tests")
+            .join("test_files")
             .join("ip_addrs_with_error.txt");
         let addr = read_ip_addresses_from_file(path).unwrap();
         assert!(addr[1].is_err());
@@ -208,7 +208,7 @@ mod test {
     #[test]
     fn file_with_ip_addrs_doesnt_exist() {
         let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("tests")
+            .join("test_files")
             .join("doesntexist.txt");
         assert!(read_ip_addresses_from_file(path).is_err())
     }
