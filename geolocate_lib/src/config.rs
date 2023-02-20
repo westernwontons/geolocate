@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use crate::Provider;
+use crate::geolocation::Provider;
 
 /// Contains the API keys for geolocation data providers.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -11,7 +11,7 @@ pub struct ApiKeyStore(HashMap<String, String>);
 impl ApiKeyStore {
     pub fn get_provider_token(
         &self,
-        provider: &Provider
+        provider: &Provider,
     ) -> anyhow::Result<String> {
         match self.0.get(&provider.to_string()) {
             Some(api_key) => Ok(api_key.to_owned()),

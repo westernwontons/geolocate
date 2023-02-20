@@ -1,4 +1,5 @@
-use crate::{traits::MutualExclusivity, GeolocationInput};
+use crate::traits::GeolocationInput;
+use crate::traits::MutualExclusivity;
 use clap::{Args, Parser, Subcommand};
 use std::{net::IpAddr, path::PathBuf};
 

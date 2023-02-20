@@ -4,8 +4,10 @@ use anyhow::Context;
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
-    ApiKeyStore, ExclusiveConfigArgument, ExclusiveGeolocationArgument,
-    Geolocation, GeolocationInput, MutualExclusivity, Provider,
+    config::ApiKeyStore,
+    geolocation::{Geolocation, Provider},
+    parser::{ExclusiveConfigArgument, ExclusiveGeolocationArgument},
+    traits::{GeolocationInput, MutualExclusivity},
 };
 
 /// Fetch geolocation data from a provider. The provider is determined

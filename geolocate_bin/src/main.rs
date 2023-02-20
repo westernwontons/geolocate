@@ -1,6 +1,10 @@
 use geolocate_lib::{
-    fetch_from_provider, load_configuration, read_or_modify_configuration,
-    CommandLineArguments, Parser, Provider, Subcommands,
+    geolocation::Provider,
+    helpers::{
+        fetch_from_provider, load_configuration, read_or_modify_configuration,
+    },
+    parser::{CommandLineArguments, Subcommands},
+    Parser,
 };
 
 #[tokio::main]
