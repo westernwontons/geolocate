@@ -1,10 +1,5 @@
-use crate::geolocate_lib::{
-    geolocation::Provider,
-    traits::{GeolocationInput, GeolocationProvider, MutualExclusivity},
-};
 use clap::{Args, Parser, Subcommand};
 use std::{net::IpAddr, path::PathBuf};
-
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct CommandLineArguments {
@@ -34,111 +29,13 @@ pub enum Command {
 #[derive(Debug, Args)]
 pub struct Ip2LocationArguments {
     /// IP Address to fetch geolocation data about. Can be IPv4 or IPv6
-    #[arg(short, long, num_args = 1.., value_delimiter = ' ')]
-    pub addrs: Option<Vec<IpAddr>>,
-
-    /// File to read IP addresses from
-    #[arg(short, long)]
-    pub file: Option<PathBuf>,
-}
-
-/// Arguments to the geolocation data providers are meant to be exclusive.
-/// The user can either provide a list of IP addresses or a file containing
-/// newline delimited list of IP addresses
-pub enum ExclusiveGeolocationArgument {
-    IpAddresses,
-    File,
-}
-
-impl MutualExclusivity for Ip2LocationArguments {
-    type ExclusiveValue = ExclusiveGeolocationArgument;
-
-    fn check_exclusivity(&self) -> anyhow::Result<Self::ExclusiveValue> {
-        match (self.addrs.as_deref(), self.file.as_deref()) {
-            (Some(_), None) => Ok(ExclusiveGeolocationArgument::IpAddresses),
-            (None, Some(_)) => Ok(ExclusiveGeolocationArgument::File),
-            (Some(_), Some(_)) => anyhow::bail!(
-                "--file and --addrs arguments are mutually exclusive"
-            ),
-            (None, None) => {
-                anyhow::bail!(
-                    "Either --file or --addrs has to be passed, but not both"
-                )
-            }
-        }
-    }
-}
-
-/// Both addrs or file whenever are used are consumed
-/// and there's no need to keep them around.
-impl GeolocationInput for Ip2LocationArguments {
-    fn addrs(&mut self) -> Option<Vec<IpAddr>> {
-        self.addrs.take()
-    }
-
-    fn file(&mut self) -> Option<PathBuf> {
-        self.file.take()
-    }
-}
-
-impl GeolocationProvider for Ip2LocationArguments {
-    fn provider(&self) -> Provider {
-        Provider::Ip2Location
-    }
+    pub addr: IpAddr,
 }
 
 #[derive(Debug, Args)]
 pub struct IpGeolocationArguments {
     /// IP Address to fetch geolocation data about. Can be IPv4 or IPv6
-    #[arg(short, long, num_args = 1.., value_delimiter = ' ')]
-    pub addrs: Option<Vec<IpAddr>>,
-
-    /// File to read IP addresses from
-    #[arg(short, long)]
-    pub file: Option<PathBuf>,
-}
-
-impl MutualExclusivity for IpGeolocationArguments {
-    type ExclusiveValue = ExclusiveGeolocationArgument;
-
-    fn check_exclusivity(&self) -> anyhow::Result<Self::ExclusiveValue> {
-        match (self.addrs.as_deref(), self.file.as_deref()) {
-            (Some(_), None) => Ok(ExclusiveGeolocationArgument::IpAddresses),
-            (None, Some(_)) => Ok(ExclusiveGeolocationArgument::File),
-            (Some(_), Some(_)) => anyhow::bail!(
-                "--file and --addrs arguments are mutually exclusive"
-            ),
-            (None, None) => {
-                anyhow::bail!(
-                    "Either --file or --addrs has to be passed, but not both"
-                )
-            }
-        }
-    }
-}
-
-impl GeolocationInput for IpGeolocationArguments {
-    fn addrs(&mut self) -> Option<Vec<IpAddr>> {
-        self.addrs.take()
-    }
-
-    fn file(&mut self) -> Option<PathBuf> {
-        self.file.take()
-    }
-}
-
-impl GeolocationProvider for IpGeolocationArguments {
-    fn provider(&self) -> Provider {
-        Provider::IpGeolocation
-    }
-}
-
-/// Config arguments are meant to be exclusive.
-/// The config file is either printed to the console
-/// or it's opened in the users favourite editor
-pub enum ExclusiveConfigArgument {
-    Show,
-    Edit,
+    pub addr: IpAddr,
 }
 
 #[derive(Debug, Args)]
@@ -154,23 +51,6 @@ pub struct ConfigArguments {
     /// Print the path to the configuration file
     #[arg(long)]
     pub print_path: bool,
-}
-
-impl MutualExclusivity for ConfigArguments {
-    type ExclusiveValue = ExclusiveConfigArgument;
-
-    fn check_exclusivity(&self) -> anyhow::Result<Self::ExclusiveValue> {
-        match (self.show, self.edit) {
-            (false, true) => Ok(ExclusiveConfigArgument::Edit),
-            (true, false) => Ok(ExclusiveConfigArgument::Show),
-            (true, true) => anyhow::bail!(
-                "Arguments --edit and --show are mutually exclusive"
-            ),
-            (false, false) => {
-                anyhow::bail!("Either --edit or --show has to be provided")
-            }
-        }
-    }
 }
 
 #[derive(Debug, Subcommand)]

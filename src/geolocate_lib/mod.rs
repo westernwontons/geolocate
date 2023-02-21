@@ -1,8 +1,9 @@
 pub mod cli;
 pub mod completions;
 pub mod config;
-pub mod geolocation;
-pub mod helpers;
+pub mod ip2location;
+pub mod ipgeolocation;
 pub mod parser;
 pub mod run;
-pub mod traits;
+
+pub use config::loader;
