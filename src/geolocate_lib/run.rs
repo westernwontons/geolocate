@@ -26,7 +26,5 @@ pub async fn run() -> anyhow::Result<()> {
         Command::Config(arguments) => operate_on_config_file(arguments, store),
 
         Command::Completions(shell) => generate_shell_completions(shell),
-    }?;
-
-    Ok(())
+    }
 }
