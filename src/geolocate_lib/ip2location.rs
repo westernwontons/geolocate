@@ -1,5 +1,5 @@
 use json_color::Colorizer;
-use reqwest::{Client, Url};
+use reqwest::{blocking::Client, Url};
 use std::{net::IpAddr, str::FromStr};
 
 pub trait Ip2LocationState {}
@@ -59,14 +59,12 @@ impl Ip2Location<BuildState> {
 impl Ip2Location<FetchState> {
     /// Get the geolocation data of an IP address from
     /// the `ip2location` provider
-    pub async fn json(&self) -> anyhow::Result<Ip2LocationResponse> {
+    pub fn json(&self) -> anyhow::Result<Ip2LocationResponse> {
         let json = self
             .client
             .get(self.url.clone())
-            .send()
-            .await?
-            .json::<Ip2LocationResponse>()
-            .await?;
+            .send()?
+            .json::<Ip2LocationResponse>()?;
         Ok(json)
     }
 }
@@ -84,7 +82,7 @@ impl Ip2LocationResponse {
     }
 }
 
-pub async fn response_from_ip2location(
+pub fn response_from_ip2location(
     arguments: super::parser::Ip2LocationArguments,
     store: &super::config::ApiKeyStore,
 ) -> anyhow::Result<()> {
@@ -93,7 +91,7 @@ pub async fn response_from_ip2location(
         .set_ip_address(arguments.addr)
         .set_api_token(store.ip2location_token()?);
     let fetcher = ip2location.build();
-    let response = fetcher.json().await?.colorize()?;
+    let response = fetcher.json()?.colorize()?;
     println!("{}", response);
     Ok(())
 }

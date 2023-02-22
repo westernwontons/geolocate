@@ -18,9 +18,8 @@ clap_complete = "4.1.2"
 colored = "2.0.0"
 confy = "0.5.1"
 json-color = "0.7.1"
-reqwest = { version = "0.11.14", features = ["json"] }
+reqwest = { version = "0.11.14", features = ["json", "blocking"] }
 serde = { version = "1.0.152", features = ["derive"] }
 serde_json = "1.0.93"
 thiserror = "1.0.38"
-tokio = { version = "1.25.0", features = ["rt"] }
 toml = "0.7.2"

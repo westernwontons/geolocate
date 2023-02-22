@@ -1,5 +1,5 @@
 use json_color::Colorizer;
-use reqwest::{Client, Url};
+use reqwest::{blocking::Client, Url};
 use std::{net::IpAddr, str::FromStr};
 
 pub trait IpGeolocationState {}
@@ -33,7 +33,7 @@ impl IpGeolocation<BuildState> {
     pub fn new() -> Self {
         Self {
             url: Url::from_str("https://api.ipgeolocation.io/ipgeo").unwrap(),
-            client: reqwest::Client::new(),
+            client: Client::new(),
             marker: std::marker::PhantomData,
         }
     }
@@ -56,14 +56,12 @@ impl IpGeolocation<BuildState> {
 }
 
 impl IpGeolocation<FetchState> {
-    pub async fn json(&self) -> anyhow::Result<IpGeolocationResponse> {
+    pub fn json(&self) -> anyhow::Result<IpGeolocationResponse> {
         let json = self
             .client
             .get(self.url.clone())
-            .send()
-            .await?
-            .json::<IpGeolocationResponse>()
-            .await?;
+            .send()?
+            .json::<IpGeolocationResponse>()?;
         Ok(json)
     }
 }
@@ -80,7 +78,7 @@ impl IpGeolocationResponse {
 #[serde(transparent)]
 pub struct IpGeolocationResponse(serde_json::Map<String, serde_json::Value>);
 
-pub async fn response_from_ipgeolocation(
+pub fn response_from_ipgeolocation(
     arguments: super::parser::IpGeolocationArguments,
     store: &super::config::ApiKeyStore,
 ) -> anyhow::Result<()> {
@@ -89,7 +87,7 @@ pub async fn response_from_ipgeolocation(
         .set_ip_address(arguments.addr)
         .set_api_token(store.ipgeolocation_token()?);
     let fetcher = ipgeolocation.build();
-    let response = fetcher.json().await?.colorize()?;
+    let response = fetcher.json()?.colorize()?;
     println!("{}", response);
     Ok(())
 }
