@@ -3,8 +3,8 @@ use reqwest::{Client, Url};
 use std::{net::IpAddr, str::FromStr};
 
 pub trait Ip2LocationState {}
-pub struct BuildState {}
-pub struct FetchState {}
+pub struct BuildState;
+pub struct FetchState;
 
 impl Ip2LocationState for BuildState {}
 impl Ip2LocationState for FetchState {}
