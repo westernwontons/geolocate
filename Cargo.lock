@@ -307,7 +307,6 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
- "thiserror",
  "toml 0.7.2",
 ]
 
