@@ -62,7 +62,7 @@ impl Ip2Location<FetchState> {
     pub fn json(&self) -> anyhow::Result<Ip2LocationResponse> {
         let json = self
             .client
-            .get(self.url.clone())
+            .get(self.url.as_str())
             .send()?
             .json::<Ip2LocationResponse>()?;
         Ok(json)
