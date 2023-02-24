@@ -1,7 +1,7 @@
 # Geolocate
 
-Geolocate is a CLI app to fetch geolocation data from various providers. Currently, we support (ip2location)[https://www.ip2location.com/] and (ipgeolocation)[https://ipgeolocation.io/].
-If you'd like others to be supported, you're welcome to create an issue.
+Geolocate is a CLI app to fetch geolocation data from various providers. Currently, we support [ip2location](https://www.ip2location.com/) and [ipgeolocation](https://ipgeolocation.io/).
+If you'd like others to be supported, you're welcome to create a feature request.
 
 ## Installation
 
@@ -12,7 +12,7 @@ Geolocate compiles on `stable`. There are multiple ways to install it:
 
 ## Usage
 
-You should start with getting some API tokens for at least one of the supported providers. Both (ip2location)[https://www.ip2location.com/] and (ipgeolocation)[https://ipgeolocation.io/]
+You should start with getting some API tokens for at least one of the supported providers. Both [ip2location](https://www.ip2location.com/) and [ipgeolocation](https://ipgeolocation.io/)
 have a free tier.
 You can save them with `geolocate config --edit`. This command will open the configuration file with you favourite editor where you will have to add the tokens.
 IMPORTANT: The key of the token has to be name of the provider. For example:
