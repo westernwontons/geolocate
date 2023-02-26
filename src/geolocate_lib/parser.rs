@@ -45,11 +45,11 @@ pub struct ConfigArguments {
     pub show: bool,
 
     /// Edit the configuration file
-    #[arg(short, long)]
+    #[arg(short, long, conflicts_with = "show")]
     pub edit: bool,
 
     /// Print the path to the configuration file
-    #[arg(long)]
+    #[arg(long, conflicts_with_all = &["show", "edit"])]
     pub print_path: bool,
 }
 
