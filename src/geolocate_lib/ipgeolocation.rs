@@ -1,9 +1,13 @@
 use json_color::Colorizer;
 use reqwest::{blocking::Client, Url};
-use std::{net::IpAddr, str::FromStr};
+use std::{dbg, net::IpAddr, str::FromStr};
+
+use super::{config::ApiKeyStore, parser::IpGeolocationArguments};
 
 pub trait IpGeolocationState {}
+#[derive(Debug)]
 struct BuildState;
+#[derive(Debug)]
 struct FetchState;
 
 impl IpGeolocationState for BuildState {}
@@ -46,7 +50,11 @@ impl IpGeolocation<BuildState> {
     pub fn set_ip_address(&mut self, ip: IpAddr) -> &mut Self {
         self.url
             .query_pairs_mut()
-            .append_pair("ip", &ip.to_string());
+            .append_pair("ip", &ip.to_string())
+            .finish();
+
+        dbg!(&self.url.to_string());
+
         self
     }
 
@@ -66,6 +74,12 @@ impl IpGeolocation<FetchState> {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct IpGeolocationResponse(serde_json::Map<String, serde_json::Value>);
+
 impl IpGeolocationResponse {
     pub fn colorize(&self) -> anyhow::Result<String> {
         let colorizer = Colorizer::arbitrary();
@@ -74,19 +88,17 @@ impl IpGeolocationResponse {
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
-#[serde(transparent)]
-pub struct IpGeolocationResponse(serde_json::Map<String, serde_json::Value>);
-
 pub fn response_from_ipgeolocation(
-    arguments: super::parser::IpGeolocationArguments,
-    store: &super::config::ApiKeyStore,
+    arguments: IpGeolocationArguments,
+    store: &ApiKeyStore,
 ) -> anyhow::Result<()> {
     let mut ipgeolocation = IpGeolocation::new();
     ipgeolocation
-        .set_ip_address(arguments.addr)
-        .set_api_token(store.ipgeolocation_token()?);
+        .set_api_token(store.ipgeolocation_token()?)
+        .set_ip_address(arguments.addr);
+
     let fetcher = ipgeolocation.build();
+
     let response = fetcher.json()?.colorize()?;
     println!("{}", response);
     Ok(())

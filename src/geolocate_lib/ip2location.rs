@@ -2,6 +2,8 @@ use json_color::Colorizer;
 use reqwest::{blocking::Client, Url};
 use std::{net::IpAddr, str::FromStr};
 
+use super::{config::ApiKeyStore, parser::Ip2LocationArguments};
+
 pub trait Ip2LocationState {}
 pub struct BuildState;
 pub struct FetchState;
@@ -83,13 +85,14 @@ impl Ip2LocationResponse {
 }
 
 pub fn response_from_ip2location(
-    arguments: super::parser::Ip2LocationArguments,
-    store: &super::config::ApiKeyStore,
+    arguments: Ip2LocationArguments,
+    store: &ApiKeyStore,
 ) -> anyhow::Result<()> {
     let mut ip2location = Ip2Location::new();
     ip2location
-        .set_ip_address(arguments.addr)
-        .set_api_token(store.ip2location_token()?);
+        .set_api_token(store.ip2location_token()?)
+        .set_ip_address(arguments.addr);
+
     let fetcher = ip2location.build();
     let response = fetcher.json()?.colorize()?;
     println!("{}", response);
